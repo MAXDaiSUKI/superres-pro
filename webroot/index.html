@@ -1,0 +1,392 @@
+<!-- SPDX-License-Identifier: CC0-1.0 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>超境画质 PRO</title>
+<style>
+:root{
+  --bg:#0d0f12; --card:#171a20; --card2:#1e232b; --line:#2a3038;
+  --txt:#e8eaee; --dim:#8b94a3; --acc:#e8283c; --acc2:#ff5a6a;
+  --ok:#2ecc71; --warn:#f5a623;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;padding:0 0 96px;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,"Noto Sans SC",Roboto,system-ui,sans-serif;
+  font-size:15px;line-height:1.45;
+}
+header{
+  position:sticky;top:0;z-index:20;background:rgba(13,15,18,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  padding:calc(12px + env(safe-area-inset-top)) 16px 10px;
+}
+h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+h1 .dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.status{margin-top:6px;font-size:12px;color:var(--dim);display:flex;flex-wrap:wrap;gap:10px}
+.status b{color:var(--txt);font-weight:600}
+.bar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line);background:var(--card2);color:var(--txt);
+  padding:7px 12px;border-radius:9px;font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;gap:5px;cursor:pointer;
+}
+.btn:active{transform:scale(.97)}
+.btn.acc{background:linear-gradient(135deg,var(--acc),#b3131f);border-color:transparent}
+.btn.ghost{background:transparent}
+input[type=search]{
+  flex:1;min-width:130px;background:var(--card);border:1px solid var(--line);
+  border-radius:9px;padding:8px 12px;color:var(--txt);font-size:14px;outline:none;
+}
+input[type=search]::placeholder{color:#5c6675}
+main{padding:10px 12px 0}
+.sec{margin:14px 0 6px;font-size:12px;color:var(--dim);letter-spacing:1px;padding-left:4px}
+.row{
+  display:flex;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;
+}
+.row.off{opacity:.6}
+.row .pkg{flex:1;min-width:0}
+.row .pkg .name{font-size:12.5px;font-weight:600;line-height:1.35;word-break:break-all;overflow-wrap:anywhere}
+.row .pkg .meta{font-size:10.5px;color:var(--dim);margin-top:3px;display:flex;gap:5px;flex-wrap:wrap}
+.tag{background:#242a33;border-radius:5px;padding:1px 6px;font-size:10px;color:#9aa4b2}
+.tag.acc{background:rgba(232,40,60,.16);color:var(--acc2)}
+.tag.ok{background:rgba(46,204,113,.14);color:var(--ok)}
+select{
+  background:var(--card2);color:var(--txt);border:1px solid var(--line);
+  border-radius:8px;padding:6px 4px;font-size:11px;font-weight:600;outline:none;max-width:74px;
+}
+.sw{position:relative;width:40px;height:23px;flex:0 0 40px;border-radius:12px;background:#333a45;transition:.18s}
+.sw.on{background:linear-gradient(135deg,var(--acc),#b3131f)}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.18s}
+.sw.on::after{transform:translateX(17px)}
+footer{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  background:rgba(13,15,18,.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+}
+footer .apply{width:100%;justify-content:center;padding:13px;font-size:15px;border-radius:12px}
+.hint{font-size:11px;color:#6b7686;text-align:center;margin-top:6px;line-height:1.5}
+#toast{
+  position:fixed;left:50%;bottom:110px;transform:translate(-50%,20px);
+  background:#22272f;border:1px solid var(--line);color:var(--txt);
+  padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;
+  transition:.2s;pointer-events:none;max-width:86vw;text-align:center;z-index:50;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+details{margin:12px 4px;color:var(--dim);font-size:12px}
+details summary{cursor:pointer;color:#9aa4b2}
+details p{margin:6px 0;line-height:1.6}
+code{color:#b7c2d0}
+#dbg{font-family:monospace;font-size:10px;color:#5c6675;white-space:pre-wrap;word-break:break-all}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot"></span>超境画质 PRO</h1>
+  <div class="status">
+    <span>服务 <b id="svc">…</b></span>
+    <span>注入 <b id="mount">…</b></span>
+    <span>插帧 <b id="interp">…</b></span>
+    <span>基础 <b id="nb">0</b> · 已选 <b id="cnt">0</b> · 已装 <b id="na">0</b></span>
+  </div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="搜索包名…">
+    <button class="btn ghost" id="fgBtn">＋当前前台</button>
+    <button class="btn ghost" id="reload">重载</button>
+    <button class="btn ghost" id="forceBtn">档位：面板优先</button>
+    <button class="btn ghost" id="allgameBtn">全局支持：开</button>
+  </div>
+</header>
+
+<main>
+  <div id="list"><div class="sec">读取中…</div></div>
+  <details>
+    <summary>参数说明 / 注意事项</summary>
+    <p><b>超分档</b>：0 = 不超分（只插帧）；1 = 超分中；2 = 超分高。</p>
+    <p><b>插帧</b>：1 = 开，0 = 关。对应 gpp_app_list 的 <code>包名,超分,插帧</code>。</p>
+    <p><b>全局支持（推荐开）</b>——写 <code>vendor.gpp.allgame.enable=1</code>，Cube 会给任意游戏返回非 0 的 <code>getGfrcCapByPkg</code>，于是每个游戏里都能打开「超境画质」原版面板自己挑档位。关掉则只有系统出厂登记过的游戏（比如鸣潮、王者）才有面板。</p>
+    <p><b>档位：面板优先</b>（默认）——模块只把游戏加进 gpp_app_list，超分/插帧交给游戏内的「超境画质」面板去调。面板只会对系统已登记支持的游戏出现（Cube 的 getGfrcCapByPkg 返回非 0）。</p>
+    <p><b>档位：强制写入</b>——按下面选的档位写进 <code>game_gfrc_mode</code>，忽略面板选择。系统里 <code>cap=0</code> 的游戏强写通常也会被立刻回退，只在少数情况下有用。</p>
+    <p>面板调完档位后，系统会把该游戏记成 <code>包名+超分档插帧gfrc</code>（第三位必须为 1 才真插帧）；GameAssist 自己只会写 <code>+010</code>。</p>
+    <p>系统要求游戏原始分辨率小于 1080×2400，否则超分不生效。</p>
+    <p>「保存并应用」会重写名单、bind mount 覆盖 /system/etc/gpp_app_list 并重启 gppservice；正在运行的游戏需切一次后台再切回来。重启手机后由模块 overlay 自动恢复。</p>
+    <p>本模块只改 gpp_app_list，不动系统分区文件，卸载即还原。</p>
+    <p id="dbg"></p>
+  </details>
+</main>
+
+<footer>
+  <button class="btn acc apply" id="apply">保存并应用</button>
+  <div class="hint" id="hint">勾选要让【超境画质】接管超分/插帧的游戏</div>
+</footer>
+<div id="toast"></div>
+
+<script>
+const MOD = '/data/adb/modules/gpp_extend';
+const DATA = '/data/adb/gpp_extend';
+const TMP = '/data/local/tmp/gpp_ui';
+const $ = s => document.querySelector(s);
+let BASE = {}, STATE = {}, ALL = [], filter = '', FORCE = false, ALLGAME = true;
+const debug = [];
+const CHUNK = 600;   // 每次读取的字节数（base64 后约 2.4K 单行）
+
+/* 桥接：只可靠返回最后一行，所以所有输出都必须压成单行 */
+function sh(cmd){
+  return new Promise((resolve, reject) => {
+    let done = false;
+    const fin = v => { if (!done){ done = true; resolve(v == null ? '' : String(v)); } };
+    try{
+      const r = ksu.exec(cmd);
+      if (r && typeof r.then === 'function'){ r.then(fin).catch(reject); return; }
+      if (typeof r === 'string'){ fin(r); return; }
+      if (r && typeof r === 'object' && typeof r.stdout === 'string'){ fin(r.stdout); return; }
+    }catch(e){ /* 继续尝试回调式 */ }
+    try{ ksu.exec(cmd, null, (code, out) => fin(out)); }catch(e){}
+    setTimeout(() => fin(''), 3000);
+  });
+}
+function b64dec(b64){
+  const bin = atob(b64.replace(/\s+/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+/* 分块读文件：dd 取块 → base64（单行）→ 还原。绕开"只返回最后一行"的限制 */
+async function readFile(path){
+  let out = '';
+  for (let i = 0; i < 200; i++){
+    const b64 = (await sh(`dd if=${path} bs=${CHUNK} skip=${i} count=1 2>/dev/null | base64 -w0`)).trim();
+    if (!b64) break;
+    let s;
+    try{ s = b64dec(b64); }catch(e){ break; }
+    out += s;
+    if (s.length < CHUNK) break;
+  }
+  return out;
+}
+/* 命令输出先落盘，再分块读 */
+async function cmdToText(cmd){
+  await sh(`${cmd} > ${TMP} 2>/dev/null`);
+  return await readFile(TMP);
+}
+function parseLines(text){
+  return text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+}
+function parseBase(text){
+  const map = {};
+  const re = /([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+),(\d+),(\d+)/g;
+  let m; while ((m = re.exec(text))) map[m[1]] = { up: +m[2], itp: +m[3] };
+  return map;
+}
+function parseState(text){
+  const map = {};
+  const re = /([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)+),(\d+),(\d+),(\d+)/g;
+  let m; while ((m = re.exec(text))) map[m[1]] = { up: +m[2], itp: +m[3], on: +m[4] };
+  return map;
+}
+function parsePkgs(text){
+  const a = [];
+  const re = /package:\s*([A-Za-z0-9_.]+)/g;
+  let m; while ((m = re.exec(text))) a.push(m[1]);
+  return a;
+}
+function toast(msg, ms){
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms || 2200);
+}
+
+function enabledOf(pkg){ const s = STATE[pkg]; return !!(s && s.on === 1); }
+
+function render(){
+  const on = [], off = [], seen = new Set();
+  const add = (pkg, isOn) => {
+    if (!pkg || seen.has(pkg)) return;
+    if (filter && pkg.toLowerCase().indexOf(filter) < 0) return;
+    seen.add(pkg);
+    (isOn ? on : off).push(pkg);
+  };
+  Object.keys(STATE).sort().forEach(p => add(p, STATE[p].on === 1));
+  Object.keys(BASE).sort().forEach(p => add(p, false));
+  ALL.slice().sort().forEach(p => add(p, false));
+
+  const mk = (pkg) => {
+    const isOn = enabledOf(pkg);
+    const s = STATE[pkg] || {};
+    const b = BASE[pkg];
+    const up = (s.on !== undefined) ? s.up : (b ? b.up : 1);
+    const itp = (s.on !== undefined) ? s.itp : (b ? b.itp : 1);
+    const tags = [];
+    if (b) tags.push('<span class="tag acc">默认 ' + b.up + '/' + b.itp + '</span>');
+    if (isOn) tags.push('<span class="tag ok">已启用</span>');
+    return `<div class="row ${isOn ? '' : 'off'}" data-pkg="${pkg}">
+      <div class="pkg">
+        <div class="name">${pkg}</div>
+        <div class="meta">${tags.join('')}</div>
+      </div>
+      <select data-role="up">
+        <option value="0"${up === 0 ? ' selected' : ''}>超分关</option>
+        <option value="1"${up === 1 ? ' selected' : ''}>超分中</option>
+        <option value="2"${up === 2 ? ' selected' : ''}>超分高</option>
+      </select>
+      <select data-role="itp">
+        <option value="0"${itp === 0 ? ' selected' : ''}>插帧关</option>
+        <option value="1"${itp === 1 ? ' selected' : ''}>插帧开</option>
+      </select>
+      <div class="sw ${isOn ? 'on' : ''}" data-role="toggle"></div>
+    </div>`;
+  };
+
+  const html = [];
+  if (on.length){ html.push('<div class="sec">已启用</div>'); on.forEach(p => html.push(mk(p))); }
+  if (off.length){ html.push('<div class="sec">' + (filter ? '搜索结果' : '可选（默认名单 + 已安装）') + ' · ' + off.length + '</div>'); off.forEach(p => html.push(mk(p))); }
+  if (!html.length) html.push('<div class="sec">没有数据 —— 点「重载」，看下面调试信息</div>');
+  $('#list').innerHTML = html.join('');
+  $('#cnt').textContent = Object.keys(STATE).filter(p => STATE[p].on === 1).length;
+  $('#nb').textContent = Object.keys(BASE).length;
+  $('#na').textContent = ALL.length;
+  $('#dbg').textContent = debug.join('\n');
+}
+
+function setPkg(pkg, patch){
+  const b = BASE[pkg];
+  const cur = STATE[pkg] || { up: b ? b.up : 1, itp: b ? b.itp : 1, on: 0 };
+  STATE[pkg] = Object.assign({}, cur, patch);
+}
+
+document.addEventListener('click', e => {
+  const row = e.target.closest('.row');
+  if (!row) return;
+  const role = e.target.dataset ? e.target.dataset.role : null;
+  if (role === 'toggle'){
+    const pkg = row.dataset.pkg;
+    setPkg(pkg, { on: enabledOf(pkg) ? 0 : 1 });
+    render();
+  }
+});
+document.addEventListener('change', e => {
+  const sel = e.target.closest('select');
+  if (!sel) return;
+  const pkg = sel.closest('.row').dataset.pkg;
+  const v = +sel.value;
+  if (sel.dataset.role === 'up') setPkg(pkg, { up: v, on: 1 });
+  if (sel.dataset.role === 'itp') setPkg(pkg, { itp: v });
+  render();
+});
+
+$('#q').addEventListener('input', e => { filter = e.target.value.trim().toLowerCase(); render(); });
+$('#reload').addEventListener('click', async () => { await refresh(); toast('已重载'); });
+$('#forceBtn').addEventListener('click', async () => {
+  FORCE = !FORCE;
+  await sh(`mkdir -p ${DATA}; echo ${FORCE ? 1 : 0} > ${DATA}/force`);
+  syncForceBtn();
+  toast(FORCE ? '档位：强制写入（忽略游戏内面板）' : '档位：面板优先（只加名单）', 2600);
+});
+$('#allgameBtn').addEventListener('click', async () => {
+  await setAllgame(!ALLGAME);
+  toast(ALLGAME ? '全局支持已开：任意游戏都会出现「超境画质」面板' : '全局支持已关：只有系统登记的游戏才有面板', 3000);
+});
+
+function syncForceBtn(){
+  const b = $('#forceBtn');
+  b.textContent = FORCE ? '档位：强制写入' : '档位：面板优先';
+  b.style.color = FORCE ? 'var(--acc2)' : '';
+}
+
+function syncAllgameBtn(){
+  const b = $('#allgameBtn');
+  b.textContent = ALLGAME ? '全局支持：开' : '全局支持：关';
+  b.style.color = ALLGAME ? 'var(--ok)' : '';
+}
+
+async function setAllgame(v){
+  ALLGAME = v;
+  await sh(`mkdir -p ${DATA}; echo ${v ? 1 : 0} > ${DATA}/allgame`);
+  await sh(`if [ -x /data/adb/ksu/bin/resetprop ]; then /data/adb/ksu/bin/resetprop vendor.gpp.allgame.enable ${v ? 1 : 0}; else resetprop vendor.gpp.allgame.enable ${v ? 1 : 0}; fi`);
+  syncAllgameBtn();
+}
+
+async function refresh(){
+  debug.length = 0;
+  try{
+    const baseText = await readFile(`${DATA}/base_list`);
+    debug.push('base.bytes=' + baseText.length);
+    BASE = parseBase(baseText);
+
+    const stateText = await readFile(`${DATA}/state.txt`);
+    debug.push('state.bytes=' + stateText.length);
+    STATE = parseState(stateText);
+
+    const forceText = (await readFile(`${DATA}/force`)).trim();
+    FORCE = forceText === '1';
+    debug.push('force=' + (FORCE ? 1 : 0));
+    syncForceBtn();
+
+    const agText = (await readFile(`${DATA}/allgame`)).trim();
+    ALLGAME = agText !== '0';
+    debug.push('allgame=' + (ALLGAME ? 1 : 0) + ' prop=' + (await sh('getprop vendor.gpp.allgame.enable')).trim());
+    syncAllgameBtn();
+
+    const pkgText = await cmdToText('pm list packages');
+    ALL = parsePkgs(pkgText);
+    debug.push('pkgs=' + ALL.length + ' bytes=' + pkgText.length);
+
+    if (!Object.keys(BASE).length){
+      const t = await cmdToText(`sh ${MOD}/ctl.sh list`);
+      debug.push('ctl.list.bytes=' + t.length);
+      BASE = parseBase(t);
+      STATE = parseState(t);
+    }
+
+    const st = (await sh(`echo "SVC=$(pidof gppservice | tr -d ' ') MOUNT=$(mount | grep -c gpp_app_list) MODE=$(getprop vendor.gpp.gfrc.interp.rate)"`)).trim();
+    debug.push('status=' + st);
+    const msvc = st.match(/SVC=(\S*)/), mmt = st.match(/MOUNT=(\d+)/), mmd = st.match(/MODE=(\d*)/);
+    $('#svc').textContent = (msvc && msvc[1]) ? '运行中 (' + msvc[1] + ')' : '未运行';
+    const mounted = mmt ? +mmt[1] > 0 : false;
+    $('#mount').textContent = mounted ? '已生效' : '未注入';
+    $('#mount').style.color = mounted ? 'var(--ok)' : 'var(--warn)';
+    const interp = mmd && mmd[1] === '1';
+    $('#interp').textContent = interp ? '工作中' : '未激活';
+    $('#interp').style.color = interp ? 'var(--ok)' : 'var(--warn)';
+    render();
+  }catch(err){
+    debug.push('ERR ' + ((err && err.message) || err));
+    render();
+    toast('读取失败，见调试信息');
+  }
+}
+
+$('#fgBtn').addEventListener('click', async () => {
+  try{
+    const out = await sh("dumpsys activity activities | grep -m1 topResumedActivity");
+    const m = out.match(/([A-Za-z0-9_.]+)\/[A-Za-z0-9_.$]+/);
+    if (!m){ toast('没识别到前台应用（调试：' + out.slice(0, 40) + '）'); return; }
+    const pkg = m[1];
+    if (!STATE[pkg]) setPkg(pkg, { on: 1, up: 1, itp: 1 });
+    else setPkg(pkg, { on: 1 });
+    render();
+    toast('已加入：' + pkg);
+  }catch(err){ toast('读取前台失败'); }
+});
+
+$('#apply').addEventListener('click', async () => {
+  const btn = $('#apply');
+  btn.disabled = true; btn.textContent = '应用中…';
+  try{
+    const lines = Object.keys(STATE).map(p => `${p},${STATE[p].up},${STATE[p].itp},${STATE[p].on ? 1 : 0}`).join('\n');
+    const b64 = btoa(unescape(encodeURIComponent(lines + '\n')));
+    await sh(`mkdir -p ${DATA}; echo '${b64}' | base64 -di > ${DATA}/state.txt`);
+    await sh(`echo ${FORCE ? 1 : 0} > ${DATA}/force`);
+    const res = await sh(`sh ${MOD}/apply.sh`);
+    if (/ERR/.test(res)) toast('应用失败：' + res.trim());
+    else { toast('已应用；正在运行的游戏需切一次后台', 3000); await refresh(); }
+  }catch(err){ toast('执行出错'); }
+  btn.disabled = false; btn.textContent = '保存并应用';
+});
+
+refresh();
+</script>
+</body>
+</html>
