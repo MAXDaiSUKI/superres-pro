@@ -1,6 +1,6 @@
 # 超境画质 PRO · SuperRes PRO
 
-> 让任意游戏在 nubia / 红魔设备上出现系统原生的「超境画质」面板，并解锁最高档位（超分 + 插帧 + 最高档位）。
+> 让任意游戏在 nubia / 红魔骁龙8E5设备上出现系统原生的「超境画质」面板，并解锁最高档位（超分 + 插帧 + 最高档位）。
 > A KernelSU WebUI module that unlocks the stock **Super Resolution / Frame Interpolation** panel for any game on ZTE/nubia ROMs.
 
 [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](LICENSE)
