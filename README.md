@@ -21,7 +21,7 @@
 
 - **已验证**：nubia NX741J（Z80 Ultra）/ NebulaAIOS 2.0 / Android 16
 - **Root**：需要 KernelSU（或带 WebUI 的 KSU 分支，如 SukiSU / KernelSU Next）
-- **未验证，但理论可行的机型**：红魔 11 系（不包括11 Air）
+- **未验证，但理论可行的机型**：红魔 11 系（不包括11 Air）、NaviX Ultra（豆包手机）
 - **其他机型**：暂不支持，原厂配置文件指定作用于SM8850（即骁龙8E5）
 
 ---
