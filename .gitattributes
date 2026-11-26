@@ -1,0 +1,11 @@
+# 统一换行，避免 Windows 端的 CRLF 混进 shell 脚本
+* text=auto eol=lf
+
+*.sh   text eol=lf
+*.prop text eol=lf
+*.md   text eol=lf
+*.py   text eol=lf
+*.html text eol=lf
+
+# 名单文件必须逐字节保持原样
+system/etc/gpp_app_list -text

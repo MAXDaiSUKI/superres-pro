@@ -1,0 +1,20 @@
+# 构建产物
+gpp_extend_v*.zip
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 调试与本地笔记
+_*.sh
+_*.js
+_*.txt
+*.log
