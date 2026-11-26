@@ -21,7 +21,7 @@
 
 - **已验证**：nubia NX741J（Z80 Ultra）/ NebulaAIOS 2.0 / Android 16
 - **Root**：需要 KernelSU（或带 WebUI 的 KSU 分支，如 SukiSU / KernelSU Next）
-- **未验证，但理论可行的机型**：红魔 11 系（不包括11s）
+- **未验证，但理论可行的机型**：红魔 11 系（不包括11 Air）
 - **未知可用性的机型**：其它 努比亚/红魔系列 支持【超境画质】的机型
 
 ---
